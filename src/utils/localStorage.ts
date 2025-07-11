@@ -1,209 +1,76 @@
-// LocalStorage utilities for The Land - React Developer Community
-export interface Post {
+// LocalStorage utilities for Pinterest app
+export interface Pin {
   id: string;
   image: string;
   title: string;
   description: string;
   category: string;
   createdBy: string;
-  createdById: string;
   saved: boolean;
   createdAt: string;
-  status: 'pending' | 'approved' | 'rejected';
 }
 
 export interface User {
   id: string;
   name: string;
-  password: string;
   avatar: string;
-  role: 'admin' | 'user';
-  savedPosts: string[];
-  createdPosts: string[];
-  createdAt: string;
-  // Legacy properties for backward compatibility
-  savedPins?: string[];
-  createdPins?: string[];
+  savedPins: string[];
+  createdPins: string[];
 }
 
-export interface AuthUser {
-  id: string;
-  name: string;
-  role: 'admin' | 'user';
-}
+const PINS_KEY = 'pinterest_pins';
+const USER_KEY = 'pinterest_user';
 
-const POSTS_KEY = 'theland_posts';
-const USERS_KEY = 'theland_users';
-const AUTH_KEY = 'theland_auth';
-
-// Sample categories for React Developer Community
+// Sample categories
 export const CATEGORIES = [
   'All',
-  'React News',
-  'Tech Tips',
-  'Code Snippets',
-  'UI/UX Design',
-  'JavaScript',
-  'TypeScript',
-  'Memes'
+  'Art',
+  'Nature',
+  'Design',
+  'Food',
+  'Travel',
+  'Fashion',
+  'Technology'
 ];
 
-// Authentication functions
-export const login = (name: string, password: string): AuthUser | null => {
+// Get all pins from localStorage
+export const getPins = (): Pin[] => {
   try {
-    const users = getUsers();
-    const user = users.find(u => u.name === name && u.password === password);
-    
-    if (user) {
-      const authUser: AuthUser = {
-        id: user.id,
-        name: user.name,
-        role: user.role
-      };
-      localStorage.setItem(AUTH_KEY, JSON.stringify(authUser));
-      return authUser;
-    }
-    return null;
+    const pins = localStorage.getItem(PINS_KEY);
+    return pins ? JSON.parse(pins) : getSamplePins();
   } catch (error) {
-    console.error('Error during login:', error);
-    return null;
+    console.error('Error getting pins:', error);
+    return getSamplePins();
   }
 };
 
-export const logout = (): void => {
-  localStorage.removeItem(AUTH_KEY);
-};
-
-export const getCurrentUser = (): AuthUser | null => {
+// Save pins to localStorage
+export const savePins = (pins: Pin[]): void => {
   try {
-    const auth = localStorage.getItem(AUTH_KEY);
-    return auth ? JSON.parse(auth) : null;
+    localStorage.setItem(PINS_KEY, JSON.stringify(pins));
   } catch (error) {
-    console.error('Error getting current user:', error);
-    return null;
+    console.error('Error saving pins:', error);
   }
 };
 
-export const isAuthenticated = (): boolean => {
-  return getCurrentUser() !== null;
-};
-
-export const isAdmin = (): boolean => {
-  const user = getCurrentUser();
-  return user?.role === 'admin';
-};
-
-// User management functions
-export const getUsers = (): User[] => {
+// Get current user from localStorage
+export const getUser = (): User => {
   try {
-    const users = localStorage.getItem(USERS_KEY);
-    return users ? JSON.parse(users) : getDefaultUsers();
+    const user = localStorage.getItem(USER_KEY);
+    return user ? JSON.parse(user) : getDefaultUser();
   } catch (error) {
-    console.error('Error getting users:', error);
-    return getDefaultUsers();
+    console.error('Error getting user:', error);
+    return getDefaultUser();
   }
 };
 
-export const saveUsers = (users: User[]): void => {
+// Save user to localStorage
+export const saveUser = (user: User): void => {
   try {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
   } catch (error) {
-    console.error('Error saving users:', error);
+    console.error('Error saving user:', error);
   }
-};
-
-export const getUserById = (id: string): User | null => {
-  const users = getUsers();
-  return users.find(user => user.id === id) || null;
-};
-
-export const registerUser = (name: string, password: string): boolean => {
-  try {
-    const users = getUsers();
-    
-    // Check if user already exists
-    if (users.find(u => u.name === name)) {
-      return false;
-    }
-    
-    const newUser: User = {
-      id: generateId(),
-      name,
-      password,
-      avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face`,
-      role: 'user',
-      savedPosts: [],
-      createdPosts: [],
-      createdAt: new Date().toISOString()
-    };
-    
-    users.push(newUser);
-    saveUsers(users);
-    return true;
-  } catch (error) {
-    console.error('Error registering user:', error);
-    return false;
-  }
-};
-
-export const updateUser = (user: User): void => {
-  const users = getUsers();
-  const index = users.findIndex(u => u.id === user.id);
-  if (index !== -1) {
-    users[index] = user;
-    saveUsers(users);
-  }
-};
-
-// Post management functions
-export const getPosts = (): Post[] => {
-  try {
-    const posts = localStorage.getItem(POSTS_KEY);
-    return posts ? JSON.parse(posts) : getSamplePosts();
-  } catch (error) {
-    console.error('Error getting posts:', error);
-    return getSamplePosts();
-  }
-};
-
-export const savePosts = (posts: Post[]): void => {
-  try {
-    localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
-  } catch (error) {
-    console.error('Error saving posts:', error);
-  }
-};
-
-export const getApprovedPosts = (): Post[] => {
-  return getPosts().filter(post => post.status === 'approved');
-};
-
-export const getPendingPosts = (): Post[] => {
-  return getPosts().filter(post => post.status === 'pending');
-};
-
-export const approvePost = (postId: string): void => {
-  const posts = getPosts();
-  const post = posts.find(p => p.id === postId);
-  if (post) {
-    post.status = 'approved';
-    savePosts(posts);
-  }
-};
-
-export const rejectPost = (postId: string): void => {
-  const posts = getPosts();
-  const post = posts.find(p => p.id === postId);
-  if (post) {
-    post.status = 'rejected';
-    savePosts(posts);
-  }
-};
-
-export const deletePost = (postId: string): void => {
-  const posts = getPosts();
-  const filteredPosts = posts.filter(p => p.id !== postId);
-  savePosts(filteredPosts);
 };
 
 // Generate unique ID
@@ -211,175 +78,95 @@ export const generateId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 };
 
-// Default admin user and sample users
-const getDefaultUsers = (): User[] => [
-  {
-    id: 'admin-1',
-    name: 'Ammarr',
-    password: 'A20%.theland',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-    role: 'admin',
-    savedPosts: [],
-    createdPosts: [],
-    createdAt: new Date().toISOString()
-  }
-];
+// Default user
+const getDefaultUser = (): User => ({
+  id: 'user-1',
+  name: 'John Doe',
+  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+  savedPins: [],
+  createdPins: []
+});
 
-// Sample posts for initial load
-const getSamplePosts = (): Post[] => [
+// Sample pins for initial load
+const getSamplePins = (): Pin[] => [
   {
     id: '1',
-    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=600&fit=crop',
-    title: 'React 18 New Features Overview',
-    description: 'A comprehensive guide to React 18\'s concurrent features, automatic batching, and Suspense improvements for React developers.',
-    category: 'React News',
-    createdBy: 'Ammarr',
-    createdById: 'admin-1',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=600&fit=crop',
+    title: 'Mountain Landscape',
+    description: 'Breathtaking mountain view during golden hour',
+    category: 'Nature',
+    createdBy: 'Nature Lover',
     saved: false,
-    status: 'approved',
     createdAt: new Date().toISOString()
   },
   {
     id: '2',
-    image: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=400&h=500&fit=crop',
-    title: 'TypeScript Tips for React Developers',
-    description: 'Essential TypeScript patterns and best practices that every React developer should know in 2024.',
-    category: 'TypeScript',
-    createdBy: 'Ammarr',
-    createdById: 'admin-1',
+    image: 'https://images.unsplash.com/photo-1541963463532-d68292c34d19?w=400&h=500&fit=crop',
+    title: 'Abstract Art',
+    description: 'Colorful geometric abstract painting',
+    category: 'Art',
+    createdBy: 'Artist Studio',
     saved: false,
-    status: 'approved',
     createdAt: new Date().toISOString()
   },
   {
     id: '3',
-    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=700&fit=crop',
-    title: 'Custom Hooks Pattern',
-    description: 'How to create powerful custom hooks for state management and side effects in React applications.',
-    category: 'Code Snippets',
-    createdBy: 'Ammarr',
-    createdById: 'admin-1',
+    image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=700&fit=crop',
+    title: 'Delicious Pizza',
+    description: 'Homemade pizza with fresh ingredients',
+    category: 'Food',
+    createdBy: 'Chef Italiano',
     saved: false,
-    status: 'approved',
     createdAt: new Date().toISOString()
   },
   {
     id: '4',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=650&fit=crop',
-    title: 'Modern React Component Architecture',
-    description: 'Best practices for organizing and structuring React components in large-scale applications.',
-    category: 'Tech Tips',
-    createdBy: 'Ammarr',
-    createdById: 'admin-1',
+    image: 'https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=400&h=650&fit=crop',
+    title: 'Modern Architecture',
+    description: 'Contemporary building design with glass facade',
+    category: 'Design',
+    createdBy: 'Architect',
     saved: false,
-    status: 'approved',
     createdAt: new Date().toISOString()
   },
   {
     id: '5',
-    image: 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=400&h=550&fit=crop',
-    title: 'React Performance Optimization',
-    description: 'Advanced techniques for optimizing React app performance: memoization, lazy loading, and bundle splitting.',
-    category: 'Tech Tips',
-    createdBy: 'Ammarr',
-    createdById: 'admin-1',
+    image: 'https://images.unsplash.com/photo-1520637836862-4d197d17c55a?w=400&h=550&fit=crop',
+    title: 'Tropical Paradise',
+    description: 'Crystal clear waters and white sand beaches',
+    category: 'Travel',
+    createdBy: 'Wanderlust',
     saved: false,
-    status: 'approved',
     createdAt: new Date().toISOString()
   },
   {
     id: '6',
-    image: 'https://images.unsplash.com/photo-1593720213428-28a5b9e94613?w=400&h=600&fit=crop',
-    title: 'Beautiful React Component Library',
-    description: 'Showcase of modern UI components built with React and styled-components for inspiring designs.',
-    category: 'UI/UX Design',
-    createdBy: 'Ammarr',
-    createdById: 'admin-1',
+    image: 'https://images.unsplash.com/photo-1544441893-675973e31985?w=400&h=600&fit=crop',
+    title: 'Fashion Portrait',
+    description: 'Elegant fashion photography in natural light',
+    category: 'Fashion',
+    createdBy: 'Style Photographer',
     saved: false,
-    status: 'approved',
     createdAt: new Date().toISOString()
   },
   {
     id: '7',
-    image: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=400&h=400&fit=crop',
-    title: 'When useEffect Becomes a Meme',
-    description: 'That moment when you realize you\'ve been using useEffect wrong for the entire project 😅',
-    category: 'Memes',
-    createdBy: 'Ammarr',
-    createdById: 'admin-1',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=400&fit=crop',
+    title: 'Tech Circuit',
+    description: 'Macro photography of circuit board',
+    category: 'Technology',
+    createdBy: 'Tech Enthusiast',
     saved: false,
-    status: 'approved',
     createdAt: new Date().toISOString()
   },
   {
     id: '8',
-    image: 'https://images.unsplash.com/photo-1541698444083-023c97d3f4b6?w=400&h=750&fit=crop',
-    title: 'JavaScript ES2024 Features',
-    description: 'New JavaScript features in ES2024 that will improve your React development workflow.',
-    category: 'JavaScript',
-    createdBy: 'Ammarr',
-    createdById: 'admin-1',
+    image: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=400&h=750&fit=crop',
+    title: 'Wildflower Field',
+    description: 'Colorful wildflowers in spring meadow',
+    category: 'Nature',
+    createdBy: 'Nature Lover',
     saved: false,
-    status: 'approved',
     createdAt: new Date().toISOString()
   }
 ];
-
-// Legacy exports for backward compatibility (will be updated throughout the app)
-export type Pin = Post;
-export const getPins = getPosts;
-export const savePins = savePosts;
-
-// Legacy user functions
-export const getUser = (): User => {
-  const currentUser = getCurrentUser();
-  if (!currentUser) {
-    return {
-      id: 'guest',
-      name: 'Guest',
-      password: '',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-      role: 'user',
-      savedPosts: [],
-      createdPosts: [],
-      createdAt: new Date().toISOString(),
-      savedPins: [],
-      createdPins: []
-    };
-  }
-  
-  const fullUser = getUserById(currentUser.id);
-  if (!fullUser) {
-    return {
-      id: currentUser.id,
-      name: currentUser.name,
-      password: '',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-      role: currentUser.role,
-      savedPosts: [],
-      createdPosts: [],
-      createdAt: new Date().toISOString(),
-      savedPins: [],
-      createdPins: []
-    };
-  }
-  
-  // Map new properties to legacy properties for backward compatibility
-  const userWithLegacy = {
-    ...fullUser,
-    savedPins: fullUser.savedPosts,
-    createdPins: fullUser.createdPosts
-  };
-  
-  return userWithLegacy;
-};
-
-export const saveUser = (user: User): void => {
-  // Map legacy properties back to new properties
-  const updatedUser = {
-    ...user,
-    savedPosts: user.savedPins || user.savedPosts || [],
-    createdPosts: user.createdPins || user.createdPosts || []
-  };
-  updateUser(updatedUser);
-};

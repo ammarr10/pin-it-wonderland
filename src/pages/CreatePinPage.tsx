@@ -102,9 +102,7 @@ const CreatePinPage: React.FC = () => {
         image: formData.imageUrl.trim(),
         category: formData.category,
         createdBy: user.name,
-        createdById: user.id,
         saved: false,
-        status: user.role === 'admin' ? 'approved' as const : 'pending' as const,
         createdAt: new Date().toISOString(),
       };
 

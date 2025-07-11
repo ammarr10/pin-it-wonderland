@@ -41,11 +41,11 @@ const Header: React.FC<HeaderProps> = ({
               to="/" 
               className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">TL</span>
+              <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-sm">P</span>
               </div>
               <span className="text-xl font-bold text-foreground hidden sm:block">
-                The Land
+                Pinterest
               </span>
             </Link>
           </div>

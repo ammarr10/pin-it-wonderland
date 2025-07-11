@@ -2,33 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The Land - Professional React Developer Community Design System */
+/* Pinterest-inspired design system with beautiful colors and gradients */
 
 @layer base {
   :root {
-    /* Professional tech-inspired color palette */
+    /* Pinterest-inspired color palette */
     --background: 0 0% 100%;
-    --foreground: 224 71% 4%;
+    --foreground: 220 9% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
+    --card-foreground: 220 9% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
+    --popover-foreground: 220 9% 15%;
 
-    /* Professional blue primary */
-    --primary: 214 93% 56%;
+    /* Pinterest red primary */
+    --primary: 349 87% 44%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 214 93% 48%;
+    --primary-hover: 349 87% 38%;
 
-    /* Clean grays */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 9% 46%;
+    /* Soft grays */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 220 9% 25%;
 
     --muted: 220 13% 91%;
     --muted-foreground: 220 9% 46%;
 
-    --accent: 188 100% 40%;
+    --accent: 211 85% 65%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -36,24 +36,16 @@
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 214 93% 56%;
+    --ring: 349 87% 44%;
 
     --radius: 0.75rem;
 
-    /* Professional tech theme tokens */
-    --tech-blue: 214 93% 56%;
-    --tech-cyan: 188 100% 40%;
-    --tech-purple: 262 52% 47%;
-    --tech-green: 158 64% 52%;
-    --tech-orange: 24 100% 50%;
-    --tech-red: 0 84% 60%;
-    
-    --post-shadow: 0 1px 3px 0 hsl(224 71% 4% / 0.05), 0 1px 2px -1px hsl(224 71% 4% / 0.05);
-    --post-shadow-hover: 0 4px 6px -1px hsl(224 71% 4% / 0.1), 0 2px 4px -2px hsl(224 71% 4% / 0.1);
-    --gradient-primary: linear-gradient(135deg, hsl(214 93% 56%), hsl(188 100% 40%));
-    --gradient-secondary: linear-gradient(135deg, hsl(262 52% 47%), hsl(214 93% 56%));
-    --gradient-accent: linear-gradient(135deg, hsl(158 64% 52%), hsl(188 100% 40%));
-    --backdrop-blur: blur(12px);
+    /* Custom Pinterest-style tokens */
+    --pin-shadow: 0 4px 12px -2px hsl(220 9% 15% / 0.08);
+    --pin-shadow-hover: 0 8px 25px -4px hsl(220 9% 15% / 0.15);
+    --gradient-primary: linear-gradient(135deg, hsl(349 87% 44%), hsl(329 87% 54%));
+    --gradient-accent: linear-gradient(135deg, hsl(211 85% 65%), hsl(231 85% 75%));
+    --backdrop-blur: blur(8px);
     --animation-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --animation-bounce: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
